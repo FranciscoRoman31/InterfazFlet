@@ -1,4 +1,5 @@
 import flet as ft
+import numpy as np
 from flet import (
     Column,
     Container,
@@ -40,6 +41,8 @@ def main(page: ft.page):
     page.horizontal_alignment = ft.CrossAxisAlignment.CENTER
     page.add(view)
 
+#Funciones para convertir las bases
+
 def convertir_a_decimal(numero, base):
     if base < 1 or base > 16:
         raise ValueError("La base debe estar entre 1 y 16")
@@ -60,7 +63,7 @@ def convertir_a_terniario(numero, base):
     if base < 1 or base > 16:
         raise ValueError("La base debe estar entre 1 y 16")
     
-    numero_terniario = ''
+    numero_terniario = ""
     while numero > 0:
         numero_terniario = str(numero % 3) + numero_terniario
         numero //= 3
@@ -71,7 +74,7 @@ def convertir_a_cuaterniario(numero, base):
     if base < 1 or base > 16:
         raise ValueError("La base debe estar entre 1 y 16")
     
-    numero_cuaterniario = ''
+    numero_cuaterniario = ""
     while numero > 0:
         numero_cuaterniario = str(numero % 4) + numero_cuaterniario
         numero //= 4
@@ -118,5 +121,66 @@ def convertir_a_binario(numero, base):
         numero //= 2
 
     return numero_binario
+
+#Funciones para realizar la eliminacion de Gauss Jordan
+
+A = np.array([[4,2,5],
+              [2,5,8],
+              [5,4,3]])
+
+B = np.array([[60.70],
+              [92.90],
+              [56.30]])
+
+casicero = 1e-15
+
+A = np.array(A,dtype=float) 
+
+AB  = np.concatenate((A,B),axis=1)
+AB0 = np.copy(AB)
+
+size = np.shape(AB)
+n = size[0]
+m = size[1]
+
+for i in range(0,n-1,1):
+    colum  = abs(AB[i:,i])
+    max = np.argmax(colum)
+    if (max !=0):
+        temporal = np.copy(AB[i,:])
+        AB[i,:] = AB[max+i,:]
+        AB[max+i,:] = temporal
+AB1 = np.copy(AB)
+
+for i in range(0,n-1,1):
+    pivot = AB[i,i]
+    adelante = i + 1
+    for k in range(adelante,n,1):
+        factor  = AB[k,i]/pivot
+        AB[k,:] = AB[k,:] - AB[i,:]*factor
+
+ultfila = n-1
+ultcolum = m-1
+X = np.zeros(n,dtype=float)
+
+for i in range(ultfila,0-1,-1):
+    suma = 0
+    for j in range(i+1,1):
+        suma = suma + AB[i,ultcolum,j]*X[j]
+    b = AB[i, ultcolum]
+    X[i] = (b-suma)/AB[i,i]
+
+X = np.transpose([X])
+
+print('Matriz aumentada:')
+print(AB0)
+print('Pivoteo parcial por filas')
+print(AB1)
+print('eliminación hacia adelante')
+print(AB)
+print('solución: ')
+print(X)
+
+ft.app(target=main)
 
 ft.app(target=main)
